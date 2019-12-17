@@ -6,6 +6,7 @@ import numpy as np
 import pycocotools.mask as maskUtils
 
 from ..registry import PIPELINES
+import cv2 as cv
 
 
 @PIPELINES.register_module
@@ -20,7 +21,9 @@ class LoadImageFromFile(object):
                                 results['img_info']['filename'])
         else:
             filename = results['img_info']['filename']
-        img = mmcv.imread(filename)
+        # to solve special character path
+        img = cv.imdecode(np.fromfile(filename, dtype=np.uint8), flags=cv.IMREAD_COLOR)
+        img = mmcv.imread(img)
         if self.to_float32:
             img = img.astype(np.float32)
         results['filename'] = filename
